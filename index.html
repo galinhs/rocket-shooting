@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+    <style>
+        body,
+        html {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        #game {
+            width: 100%;
+            height: 100vh;
+            margin: auto;
+            background: black;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #btn-start {
+            font-family: 'Orbitron', sans-serif;
+            color: tomato;
+            width: 75px;
+            height: 35px;
+            border-radius: 20px;
+            display: block;
+            transform: translate(30px, 20px);
+            text-align: center;
+        }
+
+        #game img {
+            height: 150px;
+            position: absolute;
+        }
+
+        p {
+            color: white;
+            transform: translateX(30px);
+        }
+
+        p span {
+            color: tomato;
+        }
+
+        #self {
+            width: 180px;
+            height: 180px;
+            background-image: url(./images/selffighter.png);
+            background-size: contain;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+
+        .fire {
+            width: 70px;
+            height: 70px;
+            background: url(./images/fire.png) no-repeat;
+            background-size: contain;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<!-- https://www.hiclipart.com/search?clipart=starwars -->
+<!-- https://sweetalert2.github.io/ -->
+
+<body>
+
+    <div id="game">
+        <span id="self"></span>
+        <input type="button" value="START" id="btn-start">
+        <br>
+        <p>SCORE：<span id="text-score"> </span></p>
+        <p>COUNTDOWN：<span id="text-time"> </span> sec</p>
+        <p><span style="color: yellow; border: 2px solid #fff; padding: 5px;">RECORD</span></p>
+        <p>PLAYER: <span id="highscore-player" style="color: cyan;">-</span></p>
+        <p>HIGHEST SCORE: <span id="highscore-score" style="color:#FF3ea5">-</span></p>
+    </div>
+
+
+    <script src="./jquery-3.6.0.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+
+        let score = 0
+        let countdown = 30
+        let timer = 0
+        let highscore = { name: '', score: 0 }
+        const highStorage = JSON.parse(localStorage.getItem('zombie'))
+        if (highStorage !== null) {
+            highscore = highStorage
+            $('#highscore-player').text(highscore.name)
+            $('#highscore-score').text(highscore.score)
+        }
+
+
+        const move = (enemy) => {
+            enemy.stop().animate({
+                // left: Math.round(Math.random() * 80) + '%',
+                top: Math.round(Math.random() * 90) + '%'
+            }, 1000, function () {
+                move(enemy)
+            })
+        }
+
+
+        $('#btn-start').click(function () {
+            $(this).attr('disabled', true)
+
+            score = 0
+            $('#text-score').text(score)
+
+            countdown = 30
+            $('text-time').text(countdown)
+
+            let self = $('#self')
+            $('#game').append(self)
+
+
+
+            timer = setInterval(() => {
+                countdown--
+                $('#text-time').text(countdown)
+
+                let rand = Math.round(Math.random() * 10)
+                let num = Math.ceil(Math.random() * 3)
+                if (rand > 5 && ('#game img').length < 50) {
+                    const enemy = $(` <img src="./images/enemy${num}.png" alt="" style="left:${Math.round(Math.random() * 80)}%">`)
+                    $('#game').append(enemy)
+                    move(enemy)
+                }
+
+                if (countdown <= 0) {
+                    clearInterval(timer)
+                    Swal.fire({
+                        title: "Time's Up.",
+                    })
+                    $('#game img').remove()
+                    $(this).attr('disabled', false)
+
+
+                    if (score > highscore.score) {
+                        highscore.score = score
+                        highscore.name = prompt('最高分！請輸入名字')
+                        if (highscore.name === null || highscore.name.length === 0) {
+                            highscore.name = '路人'
+                        }
+                        $('#highscore-player').text(highscore.name)
+                        $('#highscore-score').text(highscore.score)
+                        localStorage.setItem('zombie', JSON.stringify(highscore))
+                    }
+                }
+
+
+            }, 1000);
+        })
+
+
+        $('#game').on('click', function () {
+            const fire = `<span class="fire"></span>`
+            $('#game').append(fire)
+            timer2 = setInterval(() => {
+                $('#game').click(function (r) {
+                    $('.fire').css({ left: r.pageX - 25 + 'px' })
+                    $('.fire').css({ bottom: 100 + 'px' })
+                })
+                $('.fire').animate({ top: '-=1000px' })
+                if ($(this).attr('disabled', false)) {
+                    clearInterval(timer2)
+                }
+            }, 10);
+        })
+
+
+        $('#game').on('click', 'img', function () {
+            $(this).css({
+                'user-select': 'none',
+                '-webkit-user-drag': 'none',
+                'pointer-events': 'none'
+            })
+            $(this).attr('src', './images/bomb.png')
+            $(this).stop().animate({
+                top: 100 + "%"
+            }, 3000)
+            score++
+            $('#text-score').text(score)
+        })
+
+
+        window.onmousemove = (event) => {
+            const mouseX = event.pageX
+            const mouseY = event.pageY
+
+            const disX = Math.abs(mouseX - 80)
+
+            console.log(event.pageX);
+
+            $('#self').css({ left: disX + 'px' })
+
+            if (mouseX > 1839) {
+                $('#self').css({ left: disX - 100 + 'px' })
+            }
+        }
+    </script>
+</body>
+
+</html>
