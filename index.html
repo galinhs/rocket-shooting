@@ -82,8 +82,8 @@
         <span id="self"></span>
         <input type="button" value="START" id="btn-start">
         <br>
-        <p>SCORE：<span id="text-score"> </span></p>
-        <p>COUNTDOWN：<span id="text-time"> </span> sec</p>
+        <p>SCORE：<span id="text-score"></span></p>
+        <p>COUNTDOWN：<span id="text-time"></span> &nbsp;&nbsp;sec</p>
         <p><span style="color: yellow; border: 2px solid #fff; padding: 5px;">RECORD</span></p>
         <p>PLAYER: <span id="highscore-player" style="color: cyan;">-</span></p>
         <p>HIGHEST SCORE: <span id="highscore-score" style="color:#FF3ea5">-</span></p>
@@ -137,7 +137,7 @@
                 let rand = Math.round(Math.random() * 10)
                 let num = Math.ceil(Math.random() * 3)
                 if (rand > 5 && ('#game img').length < 50) {
-                    const enemy = $(` <img src="./images/enemy${num}.png" alt="" style="left:${Math.round(Math.random() * 80)}%">`)
+                    const enemy = $(` <img src="./images/enemy${num}.png" id="enemy${num}" style="left:${Math.round(Math.random() * 80)}%">`)
                     $('#game').append(enemy)
                     move(enemy)
                 }
@@ -155,7 +155,7 @@
                         highscore.score = score
                         highscore.name = prompt('最高分！請輸入名字')
                         if (highscore.name === null || highscore.name.length === 0) {
-                            highscore.name = '路人'
+                            highscore.name = 'passBy'
                         }
                         $('#highscore-player').text(highscore.name)
                         $('#highscore-score').text(highscore.score)
@@ -190,11 +190,20 @@
                 '-webkit-user-drag': 'none',
                 'pointer-events': 'none'
             })
+            let imgId = $(this).attr('id').slice(5,6)
+            console.log(imgId)
             $(this).attr('src', './images/bomb.png')
             $(this).stop().animate({
                 top: 100 + "%"
             }, 3000)
-            score++
+            if(imgId == "1"){
+              score++
+            } else if (imgId == "2"){
+                score = score+2
+            } else if (imgId == "3"){
+                score = score+3
+            }
+            console.log(score)
             $('#text-score').text(score)
         })
 
@@ -205,7 +214,7 @@
 
             const disX = Math.abs(mouseX - 80)
 
-            console.log(event.pageX);
+            // console.log(event.pageX);
 
             $('#self').css({ left: disX + 'px' })
 
