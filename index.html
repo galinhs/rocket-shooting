@@ -90,7 +90,7 @@
     </div>
 
     <script src="./jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <script>
 
@@ -136,8 +136,6 @@
             let self = $('#self')
             $('#game').append(self)
 
-
-
             timer = setInterval(() => {
                 countdown--
                 $('#text-time').text(countdown)
@@ -152,14 +150,21 @@
 
                 if (countdown <= 0) {
                     clearInterval(timer)
-                    Swal.fire({
-                        title: "Time's Up.",
-                    })
+
                     $('#game img').remove()
                     $(this).attr('disabled', false)
 
-
                     if (score > highscore.score) {
+                        Swal.fire({
+                            title: '恭喜過關',
+                            text: `你得到 ${score} 分`,
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        })
                         highscore.score = score
                         highscore.name = prompt('最高分！請輸入名字')
                         if (highscore.name === null || highscore.name.length === 0) {
@@ -170,11 +175,8 @@
                         localStorage.setItem('zombie', JSON.stringify(highscore))
                     }
                 }
-
-
             }, 1000);
         })
-
 
         $('#game').on('click', function () {
             const fire = `<span class="fire"></span>`
@@ -190,7 +192,6 @@
                 }
             }, 10);
         })
-
 
         $('#game').on('click', 'img', function () {
             $(this).css({
@@ -215,17 +216,12 @@
             $('#text-score').text(score)
         })
 
-
         window.onmousemove = (event) => {
             const mouseX = event.pageX
             const mouseY = event.pageY
-
             const disX = Math.abs(mouseX - 80)
-
             // console.log(event.pageX);
-
             $('#self').css({ left: disX + 'px' })
-
             if (mouseX > 1839) {
                 $('#self').css({ left: disX - 100 + 'px' })
             }
