@@ -106,11 +106,11 @@
         }
 
         Swal.fire({
-            title: '說明',
-            text: '發射火力擊敗敵人，不同的戰鬥機代表不同的分數喔',
-            imageWidth: 400,
-            imageHeight: 350,
-            imageUrl: 'https://github.com/galinhs/rocket-shooting/blob/main/images/score.png',
+            title: '遊戲說明',
+            text: '發射火力擊敗敵人，不同的戰鬥機代表不同的分數喔！',
+            imageWidth: 250,
+            imageHeight: 100,
+            imageUrl: 'https://github.com/galinhs/rocket-shooting/blob/main/images/score.png?raw=true',
             imageAlt: '發射火力擊敗敵人，不同的戰鬥機代表不同的分數喔！'
         })
 
@@ -156,6 +156,30 @@
 
                     if (score > highscore.score) {
                         Swal.fire({
+                            title: `你得到${score}分`,
+                            input: 'text',
+                            inputLabel: '你的名字',
+                            inputPlaceholder: '請輸入你的名字',
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            }
+                        }).then(function (result) {
+                            // highscore.name = prompt('最高分！請輸入名字')
+                            if (result.value === null) {
+                                highscore.name = 'passBy'
+                            } else {
+                                highscore.name = result.value
+                            }
+                            highscore.score = score
+                            $('#highscore-player').text(highscore.name)
+                            $('#highscore-score').text(highscore.score)
+                            localStorage.setItem('zombie', JSON.stringify(highscore))
+                        })
+                    } else {
+                        Swal.fire({
                             title: '恭喜過關',
                             text: `你得到 ${score} 分`,
                             showClass: {
@@ -165,14 +189,6 @@
                                 popup: 'animate__animated animate__fadeOutUp'
                             }
                         })
-                        highscore.score = score
-                        highscore.name = prompt('最高分！請輸入名字')
-                        if (highscore.name === null || highscore.name.length === 0) {
-                            highscore.name = 'passBy'
-                        }
-                        $('#highscore-player').text(highscore.name)
-                        $('#highscore-score').text(highscore.score)
-                        localStorage.setItem('zombie', JSON.stringify(highscore))
                     }
                 }
             }, 1000);
